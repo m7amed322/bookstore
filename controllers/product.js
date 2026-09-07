@@ -5,7 +5,7 @@ module.exports = {
         const results = await Product.find({},{});
         if(!results){
             res.status(404).send("not found");
-            
+            return;
         }
         res.send(results);
         }catch(err){
