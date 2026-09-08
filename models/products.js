@@ -11,7 +11,6 @@ const schema = joi.object({
 const productValidate = function (reqBody) {
   return schema.validate(reqBody);
 }
- schema.validate;
 const productSchema = new mongoose.Schema({
   name: { type: String, required: true },
   price: { type: Number, max: 1500, min: 0, required: true },

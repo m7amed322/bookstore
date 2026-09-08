@@ -1,40 +1,35 @@
-const {Product,productValidate} = require("../models/products");
+const { Product, productValidate } = require("../models/products");
 module.exports = {
-     getProducts:async(req,res,next)=>{
-        const results = await Product.find({},{});
-        if(!results){
-            res.status(404).send("not found");
-            return;
-        }
-        res.send(results);
-    },
-    getProductById:async(req,res,next)=>{
-        const product = await Product.findById(req.params.id)
-        if(!product){
-            res.status(404).send("not found");
-            return;
-        }
-        res.send(`the product is : 
-            ${product}`);
-    },
-    createProduct:async(req,res,next)=>{
-    const result = productValidate(req.body);
-    if(result.error){
-        res.status(400).send(result.error.message);
-        return;
+  getProducts: async (req, res, next) => {
+    const results = await Product.find({}, {});
+    if (!results) {
+      return next(new Error("not found"));
     }
-    const p =await Product.find({name:req.body.name});
-    if(p.length>0){
-    res.status(400).send("the product is already created");
-        return;
+    res.send(results);
+  },
+  getProductById: async (req, res, next) => {
+    const product = await Product.findById(req.params.id);
+    if (!product) {
+      return next(new Error("not found"));
+    }
+    res.send({product});
+  },
+  createProduct: async (req, res, next) => {
+    const {error} = productValidate(req.body);
+    if (error) {
+      return next(error.details[0]);
+    }
+    const p = await Product.find({ name: req.body.name });
+    if (p.length > 0) {
+      return next(new Error("the product is already created"));
     }
     const product = new Product({
-        name:req.body.name,
-        price:req.body.price,
-        description:req.body.description,
-        pages:req.body.pages
+      name: req.body.name,
+      price: req.body.price,
+      description: req.body.description,
+      pages: req.body.pages,
     });
     await product.save();
-    res.send("the product created successfully",product);
-}
-}
+    res.send({message:"the product created successfully", product});
+  },
+};
