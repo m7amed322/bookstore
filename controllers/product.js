@@ -2,7 +2,7 @@ const { Product, productValidate } = require("../models/products");
 module.exports = {
   getProducts: async (req, res, next) => {
     const results = await Product.find({}, {});
-    if (!results) {
+    if (results.length<1) {
       return next(new Error("not found"));
     }
     res.send(results);

@@ -1,2 +1,3 @@
 const app = require("./setup/app");
-app.listen(3000,()=>console.log("Listening...."));
+const PORT = process.env.port
+app.listen(PORT || 3000,()=>console.log(`Listening to port ${PORT} ....`));

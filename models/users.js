@@ -1,5 +1,7 @@
 const mongoose = require("mongoose");
 const joi = require("joi");
+const jwt = require("jsonwebtoken");
+const jwtPrivateKey = process.env.jwtprivatekey;
 const schema = joi.object({
   fullName:joi.string().required(),
   email:joi.string().email().required(),
@@ -14,5 +16,9 @@ const userSchema = new mongoose.Schema({
   password: {type:String , required:true,},
   role:{type:String,enum:['customer','seller','admin'], required:true , default:"customer"}
 });
+userSchema.methods.genToken = function (){
+  const token = jwt.sign({id:this._id,email:this.email,role:this.role},jwtPrivateKey);
+  return token;
+}
 const User = mongoose.model("users",userSchema);
 module.exports = {User,userValidate};

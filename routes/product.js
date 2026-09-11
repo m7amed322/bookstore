@@ -1,9 +1,11 @@
 const express = require("express");
 const productController = require("../controllers//product");
+const auth = require("../middlewares/auth");
+const admin = require("../middlewares/admin")
 const router = express.Router();
 const handler = require("../utils/errorHandling");
-router.get("/",handler(productController.getProducts));
-router.get("/:id",handler(productController.getProductById));
-router.post("/",handler(productController.createProduct));
+router.get("/",auth,handler(productController.getProducts));
+router.get("/:id",auth,handler(productController.getProductById));
+router.post("/",[auth,admin],handler(productController.createProduct));
 
 module.exports = router;
