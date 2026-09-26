@@ -1,16 +1,20 @@
-const { User, userValidate } = require("../models/users");
-const {ValidationError, BadReqError} = require("../models/error");
+const { User, userValidate, loginValidation } = require("../models/users");
+const {
+  ReqValidationError,
+  ConfilctionError,
+  BadReqError,
+} = require("../utils/error");
 const bcrypt = require("bcrypt");
 const _ = require("lodash");
 module.exports = {
   register: async (req, res, next) => {
     const { error } = userValidate(req.body);
     if (error) {
-      return next(new ValidationError(error)) ;
+      return next(new ReqValidationError(error.details[0].message));
     }
     let user = await User.find({ email: req.body.email });
     if (user.length > 0) {
-      return next(new BadReqError("the email is already exist"));
+      return next(new ConfilctionError("the email is already exist"));
     }
     user = new User({
       fullName: req.body.fullName,
@@ -27,6 +31,10 @@ module.exports = {
     });
   },
   logIn: async (req, res, next) => {
+    const { error } = loginValidation(req.body);
+    if (error) {
+      return next(new ReqValidationError(error.details[0].message));
+    }
     const user = await User.findOne({ email: req.body.email });
     if (!user) {
       next(new BadReqError("invalid email or password"));
