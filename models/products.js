@@ -1,6 +1,4 @@
-const { string, number, required } = require("joi");
 const mongoose = require("mongoose");
-const { object } = require("underscore");
 const joi = require("joi");
 const schema = joi.object({
   name:joi.string().required(),
@@ -12,7 +10,7 @@ const productValidate = function (reqBody) {
   return schema.validate(reqBody);
 }
 const productSchema = new mongoose.Schema({
-  name: { type: String, required: true },
+  name: { type: String, required: true ,unique:true },
   price: { type: Number, max: 1500, min: 0, required: true },
   description: {type:String , required:true,},
   pages:{type:Number, required:true}

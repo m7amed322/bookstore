@@ -1,15 +1,16 @@
 const { User, userValidate } = require("../models/users");
+const {ValidationError, BadReqError} = require("../models/error");
 const bcrypt = require("bcrypt");
 const _ = require("lodash");
 module.exports = {
   register: async (req, res, next) => {
     const { error } = userValidate(req.body);
     if (error) {
-      return next(error.details[0]);
+      return next(new ValidationError(error)) ;
     }
     let user = await User.find({ email: req.body.email });
     if (user.length > 0) {
-      return next(new Error("the email is already registered"));
+      return next(new BadReqError("the email is already exist"));
     }
     user = new User({
       fullName: req.body.fullName,
@@ -28,12 +29,12 @@ module.exports = {
   logIn: async (req, res, next) => {
     const user = await User.findOne({ email: req.body.email });
     if (!user) {
-      next(new Error("invalid email or password"));
+      next(new BadReqError("invalid email or password"));
       return;
     }
     const truePass = await bcrypt.compare(req.body.password, user.password);
     if (!truePass) {
-      next(new Error("invalid email or password"));
+      next(new BadReqError("invalid email or password"));
       return;
     }
     const token = user.genToken();

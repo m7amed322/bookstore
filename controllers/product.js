@@ -1,16 +1,17 @@
+const { NotFoundError, BadReqError } = require("../models/error");
 const { Product, productValidate } = require("../models/products");
 module.exports = {
   getProducts: async (req, res, next) => {
     const results = await Product.find({}, {});
     if (results.length<1) {
-      return next(new Error("not found"));
+      return next(new NotFoundError("not found"));
     }
     res.send(results);
   },
   getProductById: async (req, res, next) => {
     const product = await Product.findById(req.params.id);
     if (!product) {
-      return next(new Error("not found"));
+      return next(new NotFoundError("not found"));
     }
     res.send({product});
   },
@@ -21,7 +22,7 @@ module.exports = {
     }
     const p = await Product.find({ name: req.body.name });
     if (p.length > 0) {
-      return next(new Error("the product is already created"));
+      return next(new BadReqError("the product is already created"));
     }
     const product = new Product({
       name: req.body.name,
@@ -32,4 +33,5 @@ module.exports = {
     await product.save();
     res.send({message:"the product created successfully", product});
   },
+
 };
